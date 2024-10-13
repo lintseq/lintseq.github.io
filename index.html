@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Training Language Models on Synthetic Edit Sequences Improves Code Synthesis">
+  <meta name="keywords" content="inference-time scaling laws, code synthesis, code generation, language model, language models, LLMs, edit sequences, diff sequences, lintseq">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Synthetic Edit Sequences Improve Code Synthesis</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3MZZ3FXP27"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-3MZZ3FXP27');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.ico">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="https://upiterbarg.github.io">
+      <span class="icon">
+          <i class="fas fa-home"></i>
+      </span>
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          More Research
+        </a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="https://arxiv.org/abs/2305.19240">
+            NetHack is Hard to Hack
+          </a>
+          <a class="navbar-item" href="https://arxiv.org/abs/2312.07540">
+            diff History for Neural Language Agents
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Training Language Models on Synthetic Edit Sequences Improves Code Synthesis</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://upiterbarg.github.io">Ulyana Piterbarg</a>,</span>
+            <span class="author-block">
+              <a href="https://www.lerrelpinto.com">Lerrel Pinto</a>,</span>
+            <span class="author-block">
+              <a href="https://cs.nyu.edu/~fergus/pmwiki/pmwiki.php">Rob Fergus</a>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">New York University</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/2410.02749"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2410.02749"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/upiterbarg/lintseq"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- TinyCodeLMs. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/collections/upiter/tinycodelm-6709636f4aba6241d547334f"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-file"></i>
+                  </span>
+                  <span>TinyCodeLMs</span>
+                  </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <video id="teaser" autoplay muted loop playsinline height="100%" overflow="hidden" outline="none" >
+        <source src="./static/videos/demo_v3.mov"
+                type="video/mp4">
+      </video>
+      <h2 class="subtitle has-text-justified">
+         <b><span class="diff"> There are infinitely many ways to write a program. Training autoregressive LMs to natively synthesize programs by sampling diffs improves the trade-off between generation quality and inference-time compute</span></b>. We show that repeatedly sampling solutions to coding problems from small language models tuned on program-diff sequences yields benchmark coverage that is competitive with GPT-4 and GPT-4-Omni, with similar total cost to sampling a single generation from the best open-source LLMs like Llama 3.1 405B.
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+<br>
+<br>
+
+
+
+
+<section class="section" style="background-color:#f7f7f7">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          
+          Software engineers mainly write code by editing existing programs. In contrast, large language models (LLMs) autoregressively synthesize programs in a single pass. One explanation for this is the scarcity of open-sourced edit data. While high-quality instruction data for code synthesis is already scarce, high-quality edit data is even scarcer. To fill this gap, we develop a synthetic data generation algorithm called LintSeq. This algorithm refactors existing code into a sequence of code edits by using a linter to procedurally sample across the error-free insertions that can be used to sequentially write programs. It outputs edit sequences as text strings consisting of consecutive program diffs. To test LintSeq, we use it to refactor a dataset of instruction + program pairs into instruction + program-diff-sequence tuples. Then, we instruction finetune a series of smaller LLMs ranging from 2.6B to 14B parameters on both the re-factored and original versions of this dataset, comparing zero-shot performance on code synthesis benchmarks. We show that during repeated sampling, edit sequence finetuned models produce more diverse programs than baselines. This results in better inference-time scaling for benchmark coverage as a function of samples, i.e. the fraction of problems "pass@k" solved by any attempt given "k" tries. For example, on HumanEval pass@50, small LLMs finetuned on synthetic edit sequences are competitive with GPT-4 and outperform models finetuned on the baseline dataset by +20% (+/-3%) in absolute score. Finally, we also pretrain our own tiny LMs for code understanding. We show that finetuning tiny models on synthetic code edits results in state-of-the-art code synthesis for the on-device model class. Our 150M parameter edit sequence LM matches or outperforms code models with twice as many parameters, both with and without repeated sampling, including Codex and AlphaCode.
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+  </div>
+</section>
+
+<br>
+<br>
+
+
+<!-- Section 1 -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-multiline">
+      <div class="column is-12">
+        <h2 class="title">1. LintSeq: Code Generation as a Sequential Edit Problem</h2>
+        <p>
+         We introduce LintSeq, a simple algorithm that can be used to refactor static code data across multiple equivalent views -- i.e., into equivalent sequences of code edits or diffs. This algorithm is loosely inspired by recent work on diffusion models for text generation. LintSeq uses a linter (a static verifier for code) to sample across all of the static error-free insertion edits that can be used to write programs chunk-by-chunk. 
+        </p>
+        <div class="hero-body"  style="text-align: center;" >
+        <img src="./static/images/algorithm_viz_v16.png"
+             class="interpolation-image"
+             alt="A visualization of LintSeq."
+             width=100%
+             />
+          <br>
+          <br>
+      </div>
+      </div>
+    </div>
+  </div>
+ 
+</section>
+
+<!-- Section 2 -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-multiline">
+      <div class="column is-12">
+        <h2 class="title">2. Inference-Time Scaling Laws for Code Generation</h2>
+        <p>
+          Reparameterizing program synthesis has a dramatic impact on inference-time scaling laws. Repeatedly sampling from LMs trained with supervised finetuning (SFT) on program diff sequences yields higher quality, more diverse programs. We demonstrate this effect on six different small language models, ranging in scale from ~100M to ~10B parameters. Using SFT, we tune each model on paired natural language instruction + program-diff-sequences vs. on equivalent instruction + program data. In the plot below, we show code synthesis benchmark coverage as a function of samples across SFT-ed models (temperature 1, top-p 0.95). Coverage refers to the fraction of benchmark programming problems “pass@k” solved by any attempt given “k” tries.
+
+          <div class="hero-body"  style="text-align: center;" >
+          <img src="./static/images/diff_vs_raw_finetuning_agg_v8.png"
+             class="interpolation-image"
+             alt="Small LMs including models from the Gemma, Phi-3, and Llama 3 families exhibit better inference-time scaling laws during repeated sampling when finetuning on program diff sequences rather than on standard program data."
+             width=100%
+             />
+          <br>
+          <br>
+      </div>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+
+<!-- Section 3 -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-multiline">
+      <div class="column is-12">
+        <h2 class="title">3. Tiny Edit Sequence LMs are SOTA for their Size</h2>
+        <p>
+          To test the effect of reparameterizing code generation as a sequential edit problem on code LMs of the smallest scales, we tune two tiny decoder-only transformers  on instruction + program-diff-sequence data with SFT. These models, <a href="https://huggingface.co/collections/upiter/tinycodelm-6709636f4aba6241d547334f">TinyCodeLM-150M and TinyCodeLM-400M</a>, are pretrained for Python code understanding on only 72 billion tokens of text. The LintSeq instruction finetuned variants of both models are state-of-the-art on HumanEval and MBPP(+) for their size.
+        </p>
+        <div class="hero-body"  style="text-align: center;" >
+        <img src="./static/images/tinymodels.png"
+             class="interpolation-image"
+             alt="Tiny language models instruction finetuned on edit sequences are state-of-the-art for their size."
+             width=100%
+             />
+          <br>
+          <br>
+        </div>
+        </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{piterbarg2024editseq,
+      title={Training Language Models on Synthetic Edit Sequences Improves Code Synthesis}, 
+      author={Ulyana Piterbarg and Lerrel Pinto and Rob Fergus},
+      year={2024},
+      eprint={2410.02749},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+      }
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link"
+         href="./static/videos/nerfies_paper.pdf">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a> and is based on the Nerfies website <a
+              href="https://github.com/nerfies/nerfies.github.io">source code</a> from Park et al.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
