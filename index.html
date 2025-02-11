@@ -187,7 +187,13 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           
-          Software engineers mainly write code by editing existing programs. In contrast, language models (LMs) autoregressively synthesize programs in a single pass. One explanation for this is the scarcity of sequential edit data. While high-quality instruction data for code synthesis is scarce, edit data for synthesis is even scarcer. To fill this gap, we develop a synthetic data generation algorithm called LintSeq. This algorithm refactors programs into sequences of synthetic edits by using a linter to procedurally sample across interdependent lines of source code. Synthetic edits sampled with LintSeq reflect the syntax and semantics of their programming language. To test the algorithm, we use it to refactor a dataset of instruction + program pairs into instruction + program-diff-sequence tuples. Then, we fine-tune a series of smaller LMs ranging from 2.6B to 14B parameters on both the re-factored and original versions of this dataset. We perform comprehensive evaluations comparing edit sequence code LMs against baselines on HumanEval, MBPP(+), CodeContests, DS-1000, and BigCodeBench. We show that models fine-tuned to iteratively synthesize code match or outperform baselines on pass@1, and exhibit better scaling across higher pass@k as a function of total test-time FLOPs. Finally, we also pretrain our own tiny LMs for code understanding. We show that fine-tuning these models to synthesize code edit-by-edit results in strong performance on HumanEval and MBPP(+) compared to existing code language models of similar scale such as AlphaCode and Codex.
+          Software engineers mainly write code by editing existing programs. In contrast, language models (LMs) autoregressively synthesize programs in a single pass. One explanation for this is the scarcity of sequential edit data. While high-quality instruction data for code synthesis is scarce, edit data for synthesis is even scarcer. 
+          <br>
+          <br>
+          To fill this gap, we develop a synthetic data generation algorithm called LintSeq. This algorithm refactors programs into sequences of synthetic edits by using a linter to procedurally sample across interdependent lines of source code. <b>Synthetic edits sampled with LintSeq reflect the syntax and semantics of their programming language.</b>
+          <br>
+          <br>
+           To test the algorithm, we use it to refactor a dataset of instruction + program pairs into instruction + program-diff-sequence tuples. Then, we fine-tune a series of smaller LMs ranging from 2.6B to 14B parameters on both the re-factored and original versions of this dataset. We perform comprehensive evaluations comparing edit sequence code LMs against baselines on HumanEval, MBPP(+), CodeContests, DS-1000, and BigCodeBench. <b>We show that models fine-tuned to iteratively synthesize code match or outperform baselines on pass@1, and exhibit better scaling across higher pass@k as a function of total test-time FLOPs.</b> Finally, we also pretrain our own tiny LMs for code understanding. We show that fine-tuning these models to synthesize code edit-by-edit results in strong performance on HumanEval and MBPP(+) compared to existing code language models of similar scale such as AlphaCode and Codex.
         </div>
       </div>
     </div>
@@ -229,12 +235,12 @@
   <div class="container is-max-desktop">
     <div class="columns is-multiline">
       <div class="column is-12">
-        <h2 class="title">2. Iterative Code Generation improves the Slope of Test-Time Scaling Laws for Repeated Sampling</h2>
+        <h2 class="title">2. Sequential Code Generation improves the Slope of Test-Time Scaling Laws for Repeated Sampling</h2>
         <p>
-          By adding edits that reflect programming language abstractions to instruction data with LintSeq, we train language models to synthesize programs one ("linted") edit at a time. This results in substantial improvements to the diversity of model-generated code, compared to training on a dataset of equivalent ``single-shot'' instruction data for code synthesis. The improved diversity of generated programs means that pass@k performance increases faster as a function of test-time FLOPs, allowing for a better trade-off between the two. We demonstrate this effect on four different language models. 
+          By adding edits that reflect programming language abstractions to instruction data with LintSeq, we train language models to synthesize programs one ("linted") edit at a time. This results in <b>substantial improvements to the overall diversity of model-generated code</b>, compared to training on a dataset of equivalent "single-shot" instruction data for code synthesis. The improved diversity of sampled programs means that pass@k performance increases faster as a function of test-time FLOPs, allowing for a better trade-off between the two. We demonstrate this effect on four different language models. 
           <br>
           <br>
-          In the figure below, we report the best performance of models SFT-ed on edit sequence pre-processed vs standard instruction data after sweeping over sampling temperature, top-p, and mip-p. We then plot benchmark score (pass@k) as a function of the total cost of repeated sampling from each model in FLOPs.
+          In the figure below, we report the best performance of models SFT-ed on edit sequence pre-processed vs standard instruction data after sweeping over sampling temperature, top-p, and min-p. We then plot benchmark score (pass@k) as a function of the total cost of repeated sampling from each model in FLOPs. Shading shows standard error in linear fit.
 
           <div class="hero-body"  style="text-align: center;" >
           <img src="./static/images/test_time_v2.png"
