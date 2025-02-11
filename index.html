@@ -160,12 +160,13 @@
 <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <video id="teaser" autoplay muted loop playsinline height="100%" overflow="hidden" outline="none" >
-        <source src="./static/videos/demo_v3.mov"
-                type="video/mp4">
-      </video>
+      <img src="./static/images/teaser.png"
+             class="interpolation-image"
+             alt="A visualization of LintSeq."
+             width=100%
+             />
       <h2 class="subtitle has-text-justified">
-         <b><span class="diff"> There are infinitely many ways to write a program. Training autoregressive LMs to natively synthesize programs with sequences of diffs improves the trade-off between generation quality and inference-time compute</span></b>. We show that repeatedly sampling solutions to coding problems from small language models tuned on program-diff sequences yields benchmark coverage that is competitive with GPT-4 and GPT-4-Omni, with similar total cost to generating a single completion from the best open-source LLMs like Llama 3.1 405B.
+         <b><span class="diff"> Training autoregressive LMs to synthesize code edit-by-edit improves the slope of test-time scaling laws on benchmarks like HumanEval, MBPP, and CodeContests</span></b>. Our approach introduces an algorithm that uses code linters to generate synthetic edit data for code synthesis, at scale: LintSeq. Edits sampled with this algorithm reflect the semantics & syntax of their programming language.
       </h2>
     </div>
   </div>
@@ -186,7 +187,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           
-          Software engineers mainly write code by editing existing programs. In contrast, large language models (LLMs) autoregressively synthesize programs in a single pass. One explanation for this is the scarcity of open-sourced edit data. While high-quality instruction data for code synthesis is already scarce, high-quality edit data is even scarcer. To fill this gap, we develop a synthetic data generation algorithm called LintSeq. This algorithm refactors existing code into a sequence of code edits by using a linter to procedurally sample across the error-free insertions that can be used to sequentially write programs. It outputs edit sequences as text strings consisting of consecutive program diffs. To test LintSeq, we use it to refactor a dataset of instruction + program pairs into instruction + program-diff-sequence tuples. Then, we instruction finetune a series of smaller LLMs ranging from 2.6B to 14B parameters on both the re-factored and original versions of this dataset, comparing zero-shot performance on code synthesis benchmarks. We show that during repeated sampling, edit sequence finetuned models produce more diverse programs than baselines. This results in better inference-time scaling for benchmark coverage as a function of samples, i.e. the fraction of problems "pass@k" solved by any attempt given "k" tries. For example, on HumanEval pass@50, small LLMs finetuned on synthetic edit sequences are competitive with GPT-4 and outperform models finetuned on the baseline dataset by +20% (+/-3%) in absolute score. Finally, we also pretrain our own tiny LMs for code understanding. We show that finetuning tiny models on synthetic code edits results in state-of-the-art code synthesis for the on-device model class. Our 150M parameter edit sequence LM matches or outperforms code models with twice as many parameters, both with and without repeated sampling, including Codex and AlphaCode.
+          Software engineers mainly write code by editing existing programs. In contrast, language models (LMs) autoregressively synthesize programs in a single pass. One explanation for this is the scarcity of sequential edit data. While high-quality instruction data for code synthesis is scarce, edit data for synthesis is even scarcer. To fill this gap, we develop a synthetic data generation algorithm called LintSeq. This algorithm refactors programs into sequences of synthetic edits by using a linter to procedurally sample across interdependent lines of source code. Synthetic edits sampled with LintSeq reflect the syntax and semantics of their programming language. To test the algorithm, we use it to refactor a dataset of instruction + program pairs into instruction + program-diff-sequence tuples. Then, we fine-tune a series of smaller LMs ranging from 2.6B to 14B parameters on both the re-factored and original versions of this dataset. We perform comprehensive evaluations comparing edit sequence code LMs against baselines on HumanEval, MBPP(+), CodeContests, DS-1000, and BigCodeBench. We show that models fine-tuned to iteratively synthesize code match or outperform baselines on pass@1, and exhibit better scaling across higher pass@k as a function of total test-time FLOPs. Finally, we also pretrain our own tiny LMs for code understanding. We show that fine-tuning these models to synthesize code edit-by-edit results in strong performance on HumanEval and MBPP(+) compared to existing code language models of similar scale such as AlphaCode and Codex.
         </div>
       </div>
     </div>
@@ -206,10 +207,10 @@
       <div class="column is-12">
         <h2 class="title">1. LintSeq: Code Generation as a Sequential Edit Problem</h2>
         <p>
-         We introduce LintSeq, a simple algorithm that can be used to refactor static code data across multiple equivalent views -- i.e., into equivalent sequences of code edits or diffs. This algorithm is loosely inspired by recent work on diffusion models for text generation. LintSeq uses a linter (a static verifier for code) to sample across all of the static error-free insertion edits that can be used to write programs chunk-by-chunk. 
+         <b>LintSeq decomposes existing programs into synthetic edits that reflect the syntax & semantics of their programming language.</b> At each iteration, the algorithm samples an edit chunk from a program by: randomly selecting a line of code to delete; identifying the minimal set of lines that are dependent on this line with a code linter; and finally, removing the line and its dependents. These steps are repeated until all lines of code have been removed. LintSeq then processes the reversed sequence of program states with Unix-diff to express it as a sequence of edits.
         </p>
         <div class="hero-body"  style="text-align: center;" >
-        <img src="./static/images/algorithm_viz_v16.png"
+        <img src="./static/images/lintseq_viz.png"
              class="interpolation-image"
              alt="A visualization of LintSeq."
              width=100%
@@ -228,14 +229,17 @@
   <div class="container is-max-desktop">
     <div class="columns is-multiline">
       <div class="column is-12">
-        <h2 class="title">2. Inference-Time Scaling Laws for Code Generation</h2>
+        <h2 class="title">2. Iterative Code Generation improves the Slope of Test-Time Scaling Laws for Repeated Sampling</h2>
         <p>
-          Reparameterizing programs in training data has a dramatic impact on downstream inference-time scaling laws. Repeatedly sampling from LMs trained with supervised finetuning (SFT) on program diff sequences yields higher quality, more diverse programs. We demonstrate this effect on six different small language models, ranging in scale from ~100M to ~10B parameters. Using SFT, we tune each model on paired natural language instruction + program-diff-sequences vs. on equivalent instruction + program data. In the plot below, we show code synthesis benchmark coverage as a function of samples across SFT-ed models (temperature 1, top-p 0.95). Coverage refers to the fraction of benchmark programming problems “pass@k” solved by any attempt given “k” tries.
+          By adding edits that reflect programming language abstractions to instruction data with LintSeq, we train language models to synthesize programs one ("linted") edit at a time. This results in substantial improvements to the diversity of model-generated code, compared to training on a dataset of equivalent ``single-shot'' instruction data for code synthesis. The improved diversity of generated programs means that pass@k performance increases faster as a function of test-time FLOPs, allowing for a better trade-off between the two. We demonstrate this effect on four different language models. 
+          <br>
+          <br>
+          In the figure below, we report the best performance of models SFT-ed on edit sequence pre-processed vs standard instruction data after sweeping over sampling temperature, top-p, and mip-p. We then plot benchmark score (pass@k) as a function of the total cost of repeated sampling from each model in FLOPs.
 
           <div class="hero-body"  style="text-align: center;" >
-          <img src="./static/images/diff_vs_raw_finetuning_agg_v8.png"
+          <img src="./static/images/test_time_v2.png"
              class="interpolation-image"
-             alt="Small LMs including models from the Gemma, Phi-3, and Llama 3 families exhibit better inference-time scaling laws during repeated sampling when finetuning on program diff sequences rather than on standard program data."
+             alt="LMs from the Gemma 2, Phi-3, and Llama 3 families exhibit better inference-time scaling laws during repeated sampling when SFT-ed on program diff sequences rather than on standard program data."
              width=100%
              />
           <br>
@@ -246,33 +250,6 @@
   </div>
   
 </section>
-
-
-<!-- Section 3 -->
-<section class="section">
-  <div class="container is-max-desktop">
-    <div class="columns is-multiline">
-      <div class="column is-12">
-        <h2 class="title">3. Tiny Edit Sequence LMs are SOTA for their Size</h2>
-        <p>
-          To test the effect of reparameterizing code generation as a sequential edit problem on code LMs of the smallest scales, we tune two tiny decoder-only transformers  on instruction + program-diff-sequence data with SFT. These models, <a href="https://huggingface.co/collections/upiter/tinycodelm-6709636f4aba6241d547334f">TinyCodeLM-150M and TinyCodeLM-400M</a>, are pretrained for Python code understanding on only 72 billion tokens of text. The LintSeq instruction finetuned variants of both models are state-of-the-art on HumanEval and MBPP(+) for their size.
-        </p>
-        <div class="hero-body"  style="text-align: center;" >
-        <img src="./static/images/tinymodels.png"
-             class="interpolation-image"
-             alt="Tiny language models instruction finetuned on edit sequences are state-of-the-art for their size."
-             width=100%
-             />
-          <br>
-          <br>
-        </div>
-        </div>
-    </div>
-  </div>
-</section>
-
-
-
 
 
 
