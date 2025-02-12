@@ -166,7 +166,7 @@
              width=100%
              />
       <h2 class="subtitle has-text-justified">
-         <b><span class="diff"> Training autoregressive LMs to synthesize code edit-by-edit improves the slope of test-time scaling laws on benchmarks like HumanEval, MBPP, and CodeContests</span></b>. Our approach introduces an algorithm that uses code linters to generate synthetic edit data for code synthesis, at scale: LintSeq. Edits sampled with this algorithm reflect the semantics & syntax of their programming language, modeling human-like abstractions. We show that pre-processing SFT instruction data with LintSeq results in models that produce higher quality & more diverse programs during test-time sampling, even after accounting for the higher cost of sequential vs "single-shot" code generation.
+         <b><span class="diff"> Training autoregressive LMs to synthesize code edit-by-edit improves the slope of test-time scaling laws on benchmarks like HumanEval, MBPP, and CodeContests</span></b>. Our approach introduces an algorithm that uses code linters to generate synthetic edit data for code synthesis, at scale: LintSeq. Edits sampled with this algorithm reflect the semantics & syntax of their programming language, modeling human-like abstractions. We show that pre-processing SFT instruction data with LintSeq results in models that produce high quality & more diverse programs during test-time sampling, even after accounting for the higher cost (in tokens/FLOPs) of sequential generation.
       </h2>
     </div>
   </div>
